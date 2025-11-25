@@ -8,6 +8,11 @@ on:
   release:
     types: [created]
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   test:
     name: Run Tests
@@ -112,17 +117,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Check Docker secrets
+        id: check-secrets
+        run: |
+          if [ -z "${{ secrets.DOCKER_USERNAME }}" ] || [ -z "${{ secrets.DOCKER_PASSWORD }}" ]; then
+            echo "docker_secrets_available=false" >> $GITHUB_OUTPUT
+            echo "Docker secrets not configured, skipping Docker build"
+          else
+            echo "docker_secrets_available=true" >> $GITHUB_OUTPUT
+            echo "Docker secrets found"
+          fi
+
       - name: Set up Docker Buildx
+        if: steps.check-secrets.outputs.docker_secrets_available == 'true'
         uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
+        if: steps.check-secrets.outputs.docker_secrets_available == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-        continue-on-error: true
 
       - name: Build and push application image
+        if: steps.check-secrets.outputs.docker_secrets_available == 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -132,9 +150,9 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/form-phone:latest,${{ secrets.DOCKER_USERNAME }}/form-phone:${{ github.sha }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/form-phone:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/form-phone:buildcache,mode=max
-        continue-on-error: true
 
       - name: Build and push Storybook image
+        if: steps.check-secrets.outputs.docker_secrets_available == 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -144,7 +162,6 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/form-phone-storybook:latest,${{ secrets.DOCKER_USERNAME }}/form-phone-storybook:${{ github.sha }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/form-phone-storybook:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/form-phone-storybook:buildcache,mode=max
-        continue-on-error: true
 
   deploy-storybook:
     name: Deploy Storybook
@@ -167,5 +184,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./storybook-static
           # cname: storybook.example.com  # Раскомментируйте и укажите свой домен, если нужен
-        continue-on-error: true
 
