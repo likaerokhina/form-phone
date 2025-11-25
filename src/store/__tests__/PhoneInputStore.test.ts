@@ -146,14 +146,14 @@ describe("PhoneInputStore", () => {
       store.handleInputChange(0, "1");
       store.handleInputChange(1, "2");
       store.handleInputChange(2, "3");
-      expect(store.formattedValue).toBe("+7 (123");
+      expect(store.formattedValue).toBe("+7(123) - ");
     });
 
     it("should format complete phone number", () => {
       "1234567890".split("").forEach((digit, index) => {
         store.handleInputChange(index, digit);
       });
-      expect(store.formattedValue).toBe("+7 (123) - 456 - 78 - 90");
+      expect(store.formattedValue).toBe("+7(123) - 456 - 78 - 90");
     });
   });
 

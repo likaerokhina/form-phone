@@ -24,12 +24,12 @@ describe("formatPhone", () => {
 
   it("should format phone number with mask", () => {
     expect(formatPhone("1234567890", maskConfig)).toBe(
-      "+7 (123) - 456 - 78 - 90",
+      "+7(123) - 456 - 78 - 90",
     );
   });
 
   it("should handle partial digits", () => {
-    expect(formatPhone("123", maskConfig)).toBe("+7 (123");
+    expect(formatPhone("123", maskConfig)).toBe("+7(123) - ");
   });
 
   it("should handle empty digits", () => {

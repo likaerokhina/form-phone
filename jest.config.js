@@ -3,7 +3,26 @@ module.exports = {
   roots: ["<rootDir>/src"],
   testMatch: ["**/__tests__/**/*.ts?(x)", "**/?(*.)+(spec|test).ts?(x)"],
   transform: {
-    "^.+\\.(ts|tsx)$": "babel-jest",
+    "^.+\\.(ts|tsx|js|jsx)$": [
+      "babel-jest",
+      {
+        presets: [
+          [
+            "@babel/preset-env",
+            {
+              modules: "commonjs",
+            },
+          ],
+          [
+            "@babel/preset-react",
+            {
+              runtime: "automatic",
+            },
+          ],
+          "@babel/preset-typescript",
+        ],
+      },
+    ],
   },
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
@@ -11,6 +30,7 @@ module.exports = {
     "^@store/(.*)$": "<rootDir>/src/store/$1",
     "^@types/(.*)$": "<rootDir>/src/types/$1",
     "^@utils/(.*)$": "<rootDir>/src/utils/$1",
+    "\\.module\\.(css|less|scss|sass)$": "identity-obj-proxy",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
     "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
       "<rootDir>/__mocks__/fileMock.js",

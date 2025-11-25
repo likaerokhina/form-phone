@@ -35,6 +35,10 @@ export class PhoneInputStore implements ILocalStore {
       inputCount: computed,
       formattedValue: computed,
       isValid: computed,
+      focusedInputIndex: computed,
+      isDropdownOpen: computed,
+      masks: computed,
+      digits: computed,
       handleInputChange: action.bound,
       handleKeyDown: action.bound,
       handleMaskSelect: action.bound,
@@ -46,7 +50,7 @@ export class PhoneInputStore implements ILocalStore {
       updateValue: action.bound,
       updateOnChange: action.bound,
       destroy: action.bound,
-    });
+    } as any);
   }
 
   get currentMask(): MaskConfig {
