@@ -79,7 +79,7 @@ module.exports = {
           {
             loader: "sass-loader",
             options: {
-              api: "modern-compiler",
+              api: "modern",
             },
           },
         ],

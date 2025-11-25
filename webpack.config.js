@@ -131,7 +131,7 @@ module.exports = {
           {
             loader: "sass-loader",
             options: {
-              api: "modern-compiler",
+              api: "modern",
               sourceMap: isDevelopment,
             },
           },
@@ -166,7 +166,7 @@ module.exports = {
           {
             loader: "sass-loader",
             options: {
-              api: "modern-compiler",
+              api: "modern",
               sourceMap: isDevelopment,
             },
           },
