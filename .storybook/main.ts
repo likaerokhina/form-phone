@@ -17,7 +17,7 @@ const config: StorybookConfig = {
   webpackFinal: async (config) => {
     if (config.module && config.module.rules) {
       config.module.rules.push({
-        test: /\.scss$/,
+        test: /\.module\.(scss|sass)$/,
         use: [
           "style-loader",
           {
@@ -39,7 +39,7 @@ const config: StorybookConfig = {
           {
             loader: "sass-loader",
             options: {
-              api: "modern-compiler",
+              api: "modern",
             },
           },
         ],
