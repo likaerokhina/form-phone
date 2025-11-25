@@ -15,3 +15,10 @@ storybook-static/
 *.swp
 *.swo
 *~
+
+# Токены и секреты
+*.token
+*.pat
+.git-credentials*
+*credentials*
+PUSH_INSTRUCTIONS.md
