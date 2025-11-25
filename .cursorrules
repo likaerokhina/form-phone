@@ -1,0 +1,351 @@
+# Cursor Rules for Phone Input Project
+
+## Project Structure
+- This is a standalone React project (NOT a monorepo)
+- Main application: `src/` directory
+- Components: `src/components/`
+- Stores: `src/store/`
+- Styles: SCSS modules co-located with components
+- Tests: `src/__tests__/` or co-located `*.test.tsx`
+- Storybook: `.storybook/` config, stories in `*.stories.tsx`
+
+## Tech Stack
+- **Language**: TypeScript (strict mode)
+- **Framework**: React 18+ with functional components
+- **State Management**: MobX (with `mobx-react-lite`)
+- **Styling**: SCSS modules, CSS modules, PostCSS (autoprefixer), plain CSS
+- **Build**: Webpack 5
+- **Transpilation**: Babel (with presets: env, react, typescript)
+- **Type Checking**: TypeScript compiler (tsc)
+- **Testing**: Jest + React Testing Library
+- **Documentation**: Storybook
+- **Package Manager**: npm/yarn
+- **Deployment**: Docker + CI/CD
+
+## Code Style & Conventions
+
+### TypeScript
+- Use TypeScript strict mode
+- Interfaces MUST start with `I` prefix (e.g., `IPhoneInputStore`, `IMaskConfig`)
+- Use `type` for unions, intersections, and utility types
+- Avoid `any` - use `unknown` or proper types
+- Use explicit return types for functions when not obvious
+- Prefer `const` over `let`, avoid `var`
+
+### React Components
+- Use functional components with `React.FC` or explicit typing
+- Use `React.memo()` for performance optimization when needed
+- Use `observer()` from `mobx-react-lite` for components that use MobX stores
+- Props interfaces should be named `Props` or `ComponentNameProps`
+- Use `Component` prop pattern for polymorphic components (e.g., `Component="div"`)
+- Export default with `React.memo()` when appropriate
+
+### Imports Order
+Strict import ordering:
+1. External packages (React, third-party libraries)
+2. Internal utilities and stores
+3. Relative imports (`./`, `../`)
+4. SCSS modules (always last, named `s`)
+
+Example:
+```typescript
+import cn from "clsx";
+import * as React from "react";
+
+import { PhoneInputStore } from "../../store/PhoneInputStore";
+import { MaskConfig } from "../../types";
+
+import s from "./PhoneInput.module.scss";
+```
+
+### Naming Conventions
+- **Files**: kebab-case for components (e.g., `phone-input.tsx`)
+- **Components**: PascalCase (e.g., `PhoneInput`)
+- **Functions/Variables**: camelCase (e.g., `handleChange`, `phoneStore`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `DEFAULT_MASK`)
+- **Interfaces**: PascalCase with `I` prefix (e.g., `IPhoneInputStore`)
+- **Types**: PascalCase (e.g., `MaskConfig`, `PhoneValue`)
+- **Private class fields**: `_` prefix (e.g., `_value`, `_maskConfig`)
+
+### MobX Stores
+- Use `makeObservable` in constructor
+- Mark observables with `observable` or `observable.ref` for objects/arrays
+- Mark actions with `action` or `action.bound`
+- Mark computed values with `computed`
+- Use `runInAction` for async operations
+- Implement `ILocalStore` interface with `destroy()` method
+- Store files should end with `Store.ts` (e.g., `PhoneInputStore.ts`)
+- Use private fields with `_` prefix for internal state
+
+### Styling
+- Use SCSS modules (`.module.scss`) as primary styling method
+- Import styles as `s` (e.g., `import s from "./PhoneInput.module.scss"`)
+- Use `clsx` for conditional classes: `cn(s.className, { [s.active]: isActive })`
+- Follow BEM-like naming in class names (e.g., `root`, `root__input`, `root__input--focused`)
+- Support CSS modules, PostCSS, and plain CSS when needed
+- Use CSS custom properties for theming when appropriate
+
+### Code Formatting
+- **Quotes**: Double quotes (`"`)
+- **Semicolons**: Always required
+- **Trailing commas**: Yes (in objects, arrays, function params)
+- **Indentation**: 2 spaces
+- **Line length**: Follow Prettier defaults
+- **Curly braces**: Always required (even for single-line if statements)
+
+### Error Handling
+- Use early returns for error cases
+- Use optional chaining (`?.`) and nullish coalescing (`??`)
+- Prefer explicit null checks over truthy checks
+- Validate input data before processing
+
+### File Organization
+- Component files: `ComponentName.tsx`, `ComponentName.module.scss`, `ComponentName.test.tsx`, `ComponentName.stories.tsx`
+- Store files: `StoreName.ts` in `src/store/` directory
+- Utils: `utilityName.ts` in `utils/` directory
+- Types: Co-locate with components or in `types/` directory
+
+### Best Practices
+- Prefer arrow functions for callbacks
+- Use destructuring for props and objects
+- Use template literals for string interpolation
+- Avoid `console.log` - use proper logging or remove
+- Use `async/await` over promises chains
+- Extract complex logic into custom hooks or utility functions
+- Keep components small and focused (single responsibility)
+- Use TypeScript path aliases if configured in webpack/tsconfig
+
+### Testing
+- Write tests for utilities and business logic with Jest
+- Use React Testing Library for component tests
+- Test files should be co-located or in `__tests__` directories
+- Test user interactions, not implementation details
+- Cover MobX stores with unit tests
+- Test validation logic, mask parsing, and user interactions
+
+### Performance
+- Use `React.memo()` for expensive components
+- Use `useMemo` and `useCallback` when appropriate
+- Avoid creating objects/functions in render
+- Lazy load routes and heavy components when needed
+
+### Accessibility
+- Use semantic HTML
+- Include proper ARIA attributes when needed
+- Ensure keyboard navigation works (Tab, Arrow keys, Backspace)
+- Test with screen readers
+- Ensure focus management is correct
+
+## PhoneInput Component Requirements
+
+### Component API
+```typescript
+type MaskConfig = {
+  key: string;
+  name: string;
+  emoji: string;
+  prefix: string;
+  mask: string; // e.g., '(***) - *** - ** - **'
+};
+
+type PhoneInputProps = {
+  masks: MaskConfig[];
+  value: string; // Can be with spaces, brackets, etc.
+  onChange: (value: string) => void; // Returns formatted: +7 (123) 456 - 78 - 90
+};
+```
+
+### Features to Implement
+- Each character is a separate input field
+- All logic stored in MobX store
+- Tab navigation between inputs
+- Arrow key navigation (left/right)
+- Backspace navigation (moves to previous input)
+- Enter key validation
+- Flag dropdown with country list
+- Format value on change (normalize input, apply mask)
+
+### Store Structure
+- Store should handle mask parsing
+- Store should handle value formatting
+- Store should track current focused input index
+- Store should handle navigation (Tab, Arrow, Backspace)
+- Store should validate on Enter
+- Store should manage dropdown open/close state
+
+## Common Patterns
+
+### Component with MobX Store
+```typescript
+import { observer } from "mobx-react-lite";
+import * as React from "react";
+
+import { PhoneInputStore } from "../../store/PhoneInputStore";
+
+import s from "./PhoneInput.module.scss";
+
+type Props = {
+  masks: MaskConfig[];
+  value: string;
+  onChange: (value: string) => void;
+};
+
+const PhoneInput: React.FC<Props> = observer(({ masks, value, onChange }) => {
+  const store = React.useMemo(
+    () => new PhoneInputStore({ masks, value, onChange }),
+    [masks, value, onChange],
+  );
+
+  React.useEffect(() => {
+    return () => store.destroy();
+  }, [store]);
+
+  return <div className={s.root}>...</div>;
+});
+
+export default React.memo(PhoneInput);
+```
+
+### MobX Store Pattern
+```typescript
+import { action, computed, makeObservable, observable } from "mobx";
+
+import { ILocalStore } from "./interfaces/ILocalStore";
+
+export class PhoneInputStore implements ILocalStore {
+  private _value = "";
+  private _focusedIndex = 0;
+  private _isDropdownOpen = false;
+
+  constructor(options: PhoneInputStoreOptions) {
+    makeObservable(this, {
+      _value: observable,
+      _focusedIndex: observable,
+      _isDropdownOpen: observable,
+      value: computed,
+      formattedValue: computed,
+      handleInputChange: action.bound,
+      handleKeyDown: action.bound,
+      destroy: action.bound,
+    });
+  }
+
+  get value(): string {
+    return this._value;
+  }
+
+  get formattedValue(): string {
+    // Format logic
+    return this._value;
+  }
+
+  handleInputChange(index: number, char: string): void {
+    // Update logic
+  }
+
+  handleKeyDown(event: React.KeyboardEvent): void {
+    // Navigation logic
+  }
+
+  destroy(): void {
+    // Cleanup
+  }
+}
+```
+
+### SCSS Module Pattern
+```scss
+.root {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &__input {
+    width: 32px;
+    height: 40px;
+    text-align: center;
+
+    &--focused {
+      border-color: blue;
+    }
+  }
+
+  &__flag {
+    cursor: pointer;
+  }
+
+  &__dropdown {
+    position: absolute;
+    // ...
+  }
+}
+```
+
+## Webpack Configuration Requirements
+- Webpack 5
+- Different targets for different environments
+- Support for CSS, CSS modules, PostCSS (autoprefixer), SASS/SCSS
+- Babel loader with presets: env, react, typescript
+- TypeScript type checking via tsc (separate from Babel)
+- Source maps: different for dev and production
+- Path aliases for imports
+- Webpack dev server for development
+- Code minification: default + Terser plugin for production
+- Code splitting: by size and React.lazy/loadable
+- Proper dependency sections (dependencies/devDependencies/peerDependencies)
+
+## Testing Requirements
+- Jest for unit tests
+- React Testing Library for component tests
+- Test MobX store logic
+- Test component interactions
+- Test keyboard navigation
+- Test validation
+- Test mask formatting
+
+## Storybook Requirements
+- Configure Storybook
+- Create stories for PhoneInput component
+- Show different mask configurations
+- Show different states (focused, error, etc.)
+
+## NPM Publishing
+- Configure package.json for library publishing
+- Set up proper exports
+- Include TypeScript definitions
+- Include source maps if needed
+
+## Docker
+- Create Dockerfile
+- Multi-stage build for optimization
+- Proper layer caching
+
+## CI/CD Pipeline
+- Run tests
+- Build project
+- Publish library (if applicable)
+- Deploy Storybook
+
+## What NOT to Do
+- ❌ Don't use `any` type
+- ❌ Don't use `console.log` in production code
+- ❌ Don't create interfaces without `I` prefix
+- ❌ Don't mix import styles (always follow import order)
+- ❌ Don't use inline styles (use SCSS modules)
+- ❌ Don't forget to call `destroy()` on stores
+- ❌ Don't use `var` or `let` when `const` is sufficient
+- ❌ Don't create components without proper TypeScript types
+- ❌ Don't forget to handle cleanup in useEffect
+- ❌ Don't create stores without implementing ILocalStore
+
+## When Writing Code
+- Always follow the existing code style in the file
+- Match the indentation and formatting of surrounding code
+- Use the same naming conventions as the rest of the codebase
+- Import from the correct paths
+- Add proper TypeScript types
+- Include error handling for edge cases
+- Use MobX patterns for state management
+- Follow the import order rules strictly
+- Test keyboard navigation thoroughly
+- Ensure proper focus management

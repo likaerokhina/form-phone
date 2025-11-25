@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      target: app
+    ports:
+      - "8080:80"
+    container_name: form-phone-app
+
+  storybook:
+    build:
+      context: .
+      target: storybook
+    ports:
+      - "8081:80"
+    container_name: form-phone-storybook
+
